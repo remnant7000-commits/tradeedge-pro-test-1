@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TradeEdge Pro — 전략 연구 & 백테스트 대시보드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <i class="fas fa-chart-line"></i>
+      <span>TradeEdge Pro</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-tab="strategies">
+        <i class="fas fa-layer-group"></i><span>전략 선택</span>
+      </button>
+      <button class="nav-item" data-tab="backtest">
+        <i class="fas fa-flask"></i><span>백테스트</span>
+      </button>
+      <button class="nav-item" data-tab="dashboard">
+        <i class="fas fa-tachometer-alt"></i><span>결과 대시보드</span>
+      </button>
+      <button class="nav-item" data-tab="compare">
+        <i class="fas fa-balance-scale"></i><span>전략 비교</span>
+      </button>
+      <button class="nav-item" data-tab="ruleset">
+        <i class="fas fa-list-check"></i><span>자동매매 룰셋</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <span class="badge-research"><i class="fas fa-microscope"></i> 연구용 전용</span>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main-content">
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+      <div class="topbar-title" id="topbarTitle">전략 선택 & 규칙 관리</div>
+      <div class="topbar-right">
+        <span class="market-status"><span class="dot dot-green"></span>시뮬레이션 모드</span>
+        <span class="date-badge" id="currentDate"></span>
+      </div>
+    </header>
+
+    <!-- ===== TAB: STRATEGIES ===== -->
+    <section class="tab-content active" id="tab-strategies">
+      <div class="section-header">
+        <h2><i class="fas fa-layer-group"></i> 전략 선택 & 규칙 ON/OFF</h2>
+        <p class="section-desc">업로드된 PDF 문서에서 추출한 전략 규칙입니다. 토글로 ON/OFF 하세요.</p>
+      </div>
+
+      <div class="strategy-grid" id="strategyGrid">
+        <!-- JS로 렌더링 -->
+      </div>
+
+      <!-- 선택된 전략 상세 패널 -->
+      <div class="strategy-detail-panel" id="strategyDetailPanel">
+        <div class="panel-header">
+          <span id="detailStrategyName">전략을 클릭하면 규칙이 표시됩니다.</span>
+          <button class="btn-icon" id="closeDetail"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="detail-body" id="detailBody"></div>
+      </div>
+    </section>
+
+    <!-- ===== TAB: BACKTEST ===== -->
+    <section class="tab-content" id="tab-backtest">
+      <div class="section-header">
+        <h2><i class="fas fa-flask"></i> 백테스트 조건 설정</h2>
+        <p class="section-desc">시뮬레이션 조건을 입력하고 전략별 성과를 추정합니다.</p>
+      </div>
+
+      <div class="backtest-layout">
+        <div class="backtest-form-card">
+          <h3 class="card-title"><i class="fas fa-sliders-h"></i> 시뮬레이션 파라미터</h3>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>종목 선택</label>
+              <select id="bt-symbol">
+                <option value="TSLA">TSLA (Tesla)</option>
+                <option value="NVDA">NVDA (Nvidia)</option>
+                <option value="AMD">AMD</option>
+                <option value="AAPL">AAPL (Apple)</option>
+                <option value="QQQ">QQQ (ETF)</option>
+                <option value="SPY">SPY (ETF)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>백테스트 기간</label>
+              <select id="bt-period">
+                <option value="1">최근 1개월</option>
+                <option value="3" selected>최근 3개월</option>
+                <option value="6">최근 6개월</option>
+                <option value="12">최근 12개월</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>차트 타임프레임</label>
+              <div class="btn-group-seg">
+                <button class="seg-btn active" data-tf="1">1분</button>
+                <button class="seg-btn" data-tf="5">5분</button>
+                <button class="seg-btn" data-tf="15">15분</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>거래 시간창 (EST)</label>
+              <div class="time-range-row">
+                <input type="time" id="bt-starttime" value="09:30" />
+                <span>~</span>
+                <input type="time" id="bt-endtime" value="11:00" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>거래당 리스크 (%)</label>
+              <div class="slider-row">
+                <input type="range" id="bt-risk" min="0.5" max="5" step="0.5" value="1" />
+                <span class="slider-val" id="bt-risk-val">1.0%</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>수수료 (Round-trip %)</label>
+              <div class="slider-row">
+                <input type="range" id="bt-fee" min="0" max="0.5" step="0.02" value="0.04" />
+                <span class="slider-val" id="bt-fee-val">0.04%</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>슬리피지 (틱 수)</label>
+              <div class="slider-row">
+                <input type="range" id="bt-slippage" min="0" max="5" step="1" value="1" />
+                <span class="slider-val" id="bt-slippage-val">1 틱</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>초기 자본 ($)</label>
+              <input type="number" id="bt-capital" value="25000" min="1000" step="1000" />
+            </div>
+
+            <div class="form-group full-width">
+              <label>적용 전략 선택</label>
+              <div class="strategy-checkbox-list" id="btStrategyList">
+                <!-- JS 렌더링 -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>최소 손익비 필터</label>
+              <select id="bt-rrfilter">
+                <option value="1.5">1:1.5 이상</option>
+                <option value="2" selected>1:2 이상</option>
+                <option value="3">1:3 이상</option>
+                <option value="4">1:4 이상</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>하루 최대 거래 수</label>
+              <select id="bt-maxdaily">
+                <option value="1">1회</option>
+                <option value="2">2회</option>
+                <option value="3" selected>3회</option>
+                <option value="5">5회</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn-run" id="runBacktest">
+            <i class="fas fa-play"></i> 백테스트 실행
+          </button>
+        </div>
+
+        <div class="backtest-preview-card">
+          <h3 class="card-title"><i class="fas fa-info-circle"></i> 전략별 기본 파라미터</h3>
+          <div class="param-preview" id="paramPreview">
+            <!-- JS 렌더링 -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB: DASHBOARD ===== -->
+    <section class="tab-content" id="tab-dashboard">
+      <div class="section-header">
+        <h2><i class="fas fa-tachometer-alt"></i> 결과 대시보드</h2>
+        <p class="section-desc">백테스트 실행 후 시뮬레이션 성과를 확인하세요.</p>
+      </div>
+
+      <div class="dashboard-no-data" id="dashNoData">
+        <i class="fas fa-chart-bar"></i>
+        <p>백테스트를 먼저 실행해 주세요.</p>
+        <button class="btn-secondary" onclick="switchTab('backtest')">백테스트 탭으로 이동</button>
+      </div>
+
+      <div class="dashboard-results hidden" id="dashResults">
+        <!-- KPI Cards -->
+        <div class="kpi-grid" id="kpiGrid"></div>
+
+        <!-- Charts Row -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span>누적 손익 곡선</span>
+              <select id="equityCurveSelector"></select>
+            </div>
+            <div style="height:260px;"><canvas id="equityChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header"><span>시간대별 거래 성과</span></div>
+            <div style="height:260px;"><canvas id="hourChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-card-header"><span>전략별 승률 비교</span></div>
+            <div style="height:260px;"><canvas id="winRateChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header"><span>R-Multiple 분포</span></div>
+            <div style="height:260px;"><canvas id="rMultipleChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Trade Log Table -->
+        <div class="table-card">
+          <div class="table-card-header">
+            <span>거래 로그</span>
+            <input type="text" class="table-search" id="tradeLogSearch" placeholder="검색..." />
+          </div>
+          <div class="table-scroll">
+            <table class="data-table" id="tradeLogTable">
+              <thead>
+                <tr>
+                  <th class="sortable" data-col="no">#</th>
+                  <th class="sortable" data-col="date">날짜</th>
+                  <th class="sortable" data-col="strategy">전략</th>
+                  <th class="sortable" data-col="side">방향</th>
+                  <th class="sortable" data-col="entry">진입가</th>
+                  <th class="sortable" data-col="exit">청산가</th>
+                  <th class="sortable" data-col="rr">R/R</th>
+                  <th class="sortable" data-col="result">결과</th>
+                  <th class="sortable" data-col="pnl">P&L ($)</th>
+                </tr>
+              </thead>
+              <tbody id="tradeLogBody"></tbody>
+            </table>
+          </div>
+          <div class="table-pagination" id="tablePagination"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB: COMPARE ===== -->
+    <section class="tab-content" id="tab-compare">
+      <div class="section-header">
+        <h2><i class="fas fa-balance-scale"></i> 전략 비교 테이블</h2>
+        <p class="section-desc">PDF 문서에서 추출된 수치 + 시뮬레이션 결과를 한눈에 비교합니다.</p>
+      </div>
+
+      <div class="compare-controls">
+        <button class="btn-secondary" id="sortWinRate"><i class="fas fa-sort"></i> 승률순</button>
+        <button class="btn-secondary" id="sortPF"><i class="fas fa-sort"></i> PF순</button>
+        <button class="btn-secondary" id="sortRR"><i class="fas fa-sort"></i> R/R순</button>
+        <button class="btn-secondary" id="resetSort"><i class="fas fa-undo"></i> 초기화</button>
+      </div>
+
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="data-table compare-table" id="compareTable">
+            <thead>
+              <tr>
+                <th>전략명</th>
+                <th>시간대</th>
+                <th>타임프레임</th>
+                <th>문서 승률</th>
+                <th>문서 R/R</th>
+                <th>시뮬 승률</th>
+                <th>시뮬 R/R</th>
+                <th>시뮬 PF</th>
+                <th>시뮬 MDD</th>
+                <th>자동화 난이도</th>
+                <th>추천도</th>
+              </tr>
+            </thead>
+            <tbody id="compareBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="compare-chart-row">
+        <div class="chart-card">
+          <div class="chart-card-header"><span>전략별 Profit Factor 비교</span></div>
+          <div style="height:280px;"><canvas id="pfCompareChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-header"><span>전략별 승률 vs R/R 산점도</span></div>
+          <div style="height:280px;"><canvas id="scatterChart"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB: RULESET ===== -->
+    <section class="tab-content" id="tab-ruleset">
+      <div class="section-header">
+        <h2><i class="fas fa-list-check"></i> 자동매매용 룰셋 표</h2>
+        <p class="section-desc">각 전략의 진입/청산/필터 조건을 자동화 코드로 변환하기 쉽게 정리한 표입니다.</p>
+      </div>
+
+      <div class="ruleset-filter-row">
+        <label>전략 필터:</label>
+        <select id="rulesetStrategyFilter">
+          <option value="all">전체</option>
+        </select>
+        <label>조건 타입:</label>
+        <select id="rulesetTypeFilter">
+          <option value="all">전체</option>
+          <option value="entry">진입</option>
+          <option value="exit">청산</option>
+          <option value="filter">필터</option>
+          <option value="risk">리스크</option>
+        </select>
+      </div>
+
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="data-table ruleset-table" id="rulesetTable">
+            <thead>
+              <tr>
+                <th>전략</th>
+                <th>조건 타입</th>
+                <th>규칙 설명</th>
+                <th>데이터 요구사항</th>
+                <th>정량적 기준</th>
+                <th>자동화 가능 여부</th>
+              </tr>
+            </thead>
+            <tbody id="rulesetBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- A+ Scoring System -->
+      <div class="section-header" style="margin-top:2rem;">
+        <h2><i class="fas fa-star"></i> A+ 신호 스코어링 시스템</h2>
+      </div>
+      <div class="scoring-card" id="scoringCard">
+        <!-- JS 렌더링 -->
+      </div>
+    </section>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
