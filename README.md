@@ -1,5 +1,18 @@
 # TradeEdge Pro — 전략 연구 & 백테스트 대시보드
 
+## 접속 링크
+
+- GitHub 저장소: <https://github.com/remnant7000-commits/tradeedge-pro-test-1>
+- GitHub Pages(배포 링크): <https://remnant7000-commits.github.io/tradeedge-pro-test-1/>
+  - 아직 404가 나오면 GitHub 저장소의 `Settings > Pages`에서
+    - Source: `Deploy from a branch`
+    - Branch: `main` / `/(root)`
+    로 저장 후 1~3분 기다리면 접속됩니다.
+
+## 상세 문서
+
+- 개발/수정 협업 가이드: `docs/DEVELOPMENT_GUIDE.md`
+
 ## 프로젝트 개요
 업로드된 트레이딩 전략 PDF 문서들을 바탕으로, 전략 연구·시그널 분석·백테스트 시뮬레이션을 위한 다크 트레이딩 대시보드 앱입니다.
 
